@@ -1,77 +1,101 @@
-# How to bind the SQL Database in UWP Chart (SfChart)?
+# How to bind the SQL Database in UWP Chart?
 
 This example illustrates how to establish the SQL connection and bind the retrieving data from database in a step by step process:
 
-**Step 1:** Retrieve the data table from the SQL DataSet using the connection string.
-```
+**Step 1:**  Create a ViewModel class that establishes a connection to your SQLite database, executes a query, and retrieves the data into an ObservableCollection<ChartDataItem>. The database file is created and seeded in the app’s local folder on first run in this example.
+```csharp
 public class ViewModel
 {
-    public ViewModel()
-    {
-        try
-        {
-            SqlConnection thisConnection = new SqlConnection(ConnectionString);
-            thisConnection.Open();
-            string Get_Data = "SELECT * FROM ChartData";
-            SqlCommand cmd = thisConnection.CreateCommand();
-            cmd.CommandText = Get_Data;
-            SqlDataAdapter sda = new SqlDataAdapter(cmd);
-            DataSet ds = new DataSet();
-            sda.Fill(ds);
-            var table = ds.Tables[0];
-            this.DataTable = table;
-        }
-        catch
-        {
-            return;
-        }
-    }
+    public ObservableCollection<ChartDataItem> DataTable { get; } = new ObservableCollection<ChartDataItem>();
 
-    public object DataTable { get; set; }
+    . . .
 
-    public static string ConnectionString
+    // Creates a SQLite DB in LocalFolder on first run and seeds simple rows
+    private static async Task<string> EnsureAndSeedDatabaseAsync(string dbFileName)
     {
-        get
+        var localFolder = ApplicationData.Current.LocalFolder;
+        var existing = await localFolder.TryGetItemAsync(dbFileName);
+        var dbPath = Path.Combine(localFolder.Path, dbFileName);
+
+        if (existing == null)
         {
-            string currentDir = System.Environment.CurrentDirectory;
-            currentDir = currentDir.Substring(0, currentDir.Length - 10) + "\\LocalDataBase";
-            return @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=" + currentDir + @"\SeriesItemsSource.mdf;Integrated Security=True";
+            using (var connection = new SqliteConnection($"Data Source={dbPath}"))
+            {
+                await connection.OpenAsync();
+
+                // Create table
+                using (var create = connection.CreateCommand())
+                {
+                    create.CommandText = @"
+                        CREATE TABLE IF NOT EXISTS ChartData (
+                            xValue REAL NOT NULL,
+                            yValue REAL NOT NULL
+                        );";
+                    await create.ExecuteNonQueryAsync();
+                }
+
+                // Seed a few sample points
+                using (var tx = connection.BeginTransaction())
+                using (var insert = connection.CreateCommand())
+                {
+                    insert.CommandText = "INSERT INTO ChartData (xValue, yValue) VALUES ($x, $y)";
+                    var px = insert.CreateParameter(); px.ParameterName = "$x"; insert.Parameters.Add(px);
+                    var py = insert.CreateParameter(); py.ParameterName = "$y"; insert.Parameters.Add(py);
+
+                    var points = new (double x, double y)[]
+                    {
+                        (1, 10), (2, 14), (3, 9), (4, 18), (5, 22), (6, 17), (7, 25)
+                    };
+
+                    foreach (var (x, y) in points)
+                    {
+                        px.Value = x;
+                        py.Value = y;
+                        await insert.ExecuteNonQueryAsync();
+                    }
+
+                    tx.Commit();
+                }
+            }
         }
+
+        return dbPath;
     }
 }
 ```
 
-**Step 2:** In the main page, initialize the SfChart control and bind the retrieved data.
-```
+**Step 2:** Set up the [SfChart](https://help.syncfusion.com/cr/uwp/Syncfusion.UI.Xaml.Charts.SfChart.html) control with appropriate axes and bind the ItemsSource of a chart series to the DataTable property from your ViewModel. Specify the XBindingPath and YBindingPath to map to the respective columns in your database table.
+```xml
 <Grid>
-        <Grid.DataContext>
-            <local:ViewModel></local:ViewModel>
-        </Grid.DataContext>
-        
-        <chart:SfChart Margin="10">
-            
-            <chart:SfChart.PrimaryAxis>
-                <chart:NumericalAxis RangePadding="Additional"/>
-            </chart:SfChart.PrimaryAxis>
- 
-            <chart:SfChart.SecondaryAxis>
-                <chart:NumericalAxis RangePadding="Additional"/>
-            </chart:SfChart.SecondaryAxis>
- 
-            <chart:ScatterSeries ItemsSource="{Binding DataTable}"
-                                 XBindingPath="xVal" 
-                                 YBindingPath="yVal"/>
-        </chart:SfChart>
-        
+    <Grid.DataContext>
+        <local:ViewModel/>
+    </Grid.DataContext>
+
+    <chart:SfChart Margin="10">
+
+        <chart:SfChart.PrimaryAxis>
+            <chart:NumericalAxis RangePadding="Additional" />
+        </chart:SfChart.PrimaryAxis>
+
+        <chart:SfChart.SecondaryAxis>
+            <chart:NumericalAxis RangePadding="Additional" />
+        </chart:SfChart.SecondaryAxis>
+
+        <chart:ScatterSeries ItemsSource="{Binding DataTable}"
+                             XBindingPath="XValue"
+                             YBindingPath="YValue" />
+    </chart:SfChart>
 </Grid>
 ```
 
-## Output:
+## Output
 
 ![SQL DataBinding to UWP SfChart](https://user-images.githubusercontent.com/53489303/200761566-1e210d5c-0740-4a08-9b58-8cc264ff0691.png)
 
-KB article - [How to bind the SQL Database in UWP Chart (SfChart)?](https://www.syncfusion.com/kb/11664/how-to-bind-the-sql-database-in-uwp-chart)
+## Troubleshooting
 
-## See also
+### Path Too Long Exception
 
-[How to bind the SQL Database to WPF Charts](https://www.syncfusion.com/kb/11595/how-to-bind-the-sql-database-to-wpf-charts)
+If you are facing a "Path too long" exception when building this example project, close Visual Studio and rename the repository to a shorter name before building the project.
+
+Refer to the knowledge base article [How to bind the SQL Database in UWP Chart]().

@@ -73,7 +73,7 @@ namespace SQLiteChartBinding_UWP
                         await create.ExecuteNonQueryAsync();
                     }
 
-                    // Seed a few sample points (you can change these)
+                    // Seed a few sample points
                     using (var tx = connection.BeginTransaction())
                     using (var insert = connection.CreateCommand())
                     {

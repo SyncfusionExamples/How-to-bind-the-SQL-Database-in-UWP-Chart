@@ -11,7 +11,7 @@ namespace SQLiteChartBinding_UWP
     {
         public MainPage()
         {
-            this.InitializeComponent();
+            InitializeComponent();
         }
     }
 }
