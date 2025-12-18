@@ -89,8 +89,7 @@ public class ViewModel
 ```
 
 ## Output
-
-![SQL DataBinding to UWP SfChart](https://user-images.githubusercontent.com/53489303/200761566-1e210d5c-0740-4a08-9b58-8cc264ff0691.png)
+<img width="1139" height="682" alt="image" src="https://github.com/user-attachments/assets/150d7535-ff50-436a-8fcb-0d9f4ec39bdf" />
 
 ## Troubleshooting
 
