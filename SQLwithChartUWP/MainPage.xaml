@@ -10,9 +10,8 @@
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
     <Grid>
-
         <Grid.DataContext>
-            <local:ViewModel></local:ViewModel>
+            <local:ViewModel/>
         </Grid.DataContext>
 
         <chart:SfChart Margin="10">
@@ -26,9 +25,8 @@
             </chart:SfChart.SecondaryAxis>
 
             <chart:ScatterSeries ItemsSource="{Binding DataTable}"
-                                 XBindingPath="xval"
-                                YBindingPath="yval"/>
+                                 XBindingPath="XValue"
+                                 YBindingPath="YValue"/>
         </chart:SfChart>
-
     </Grid>
 </Page>
