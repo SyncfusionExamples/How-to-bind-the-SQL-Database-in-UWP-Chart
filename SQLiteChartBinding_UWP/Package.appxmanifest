@@ -8,14 +8,14 @@
 
   <Identity
     Name="5a3ae757-ef0b-4ef3-a3a8-9c54d1869ed0"
-    Publisher="CN=SubashSorimuthupatta"
+    Publisher="CN=Subash"
     Version="1.0.0.0" />
 
   <mp:PhoneIdentity PhoneProductId="5a3ae757-ef0b-4ef3-a3a8-9c54d1869ed0" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
 
   <Properties>
     <DisplayName>SQLiteChartBinding_UWP</DisplayName>
-    <PublisherDisplayName>SubashSorimuthupatta</PublisherDisplayName>
+    <PublisherDisplayName>Subash</PublisherDisplayName>
     <Logo>Assets\StoreLogo.png</Logo>
   </Properties>
 
