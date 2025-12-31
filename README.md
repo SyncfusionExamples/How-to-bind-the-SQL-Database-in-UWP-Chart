@@ -97,4 +97,4 @@ public class ViewModel
 
 If you are facing a "Path too long" exception when building this example project, close Visual Studio and rename the repository to a shorter name before building the project.
 
-Refer to the knowledge base article [How to bind the SQL Database in UWP Chart]().
+Refer to the knowledge base article [How to bind the SQL Database in UWP Chart](https://support.syncfusion.com/kb/article/10133/how-to-bind-the-sql-database-in-uwp-chart).
